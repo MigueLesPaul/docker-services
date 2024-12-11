@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  postgis:
+    image: postgis/postgis:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: Mg6LCdqKIUxu8et0FFr
+      POSTGRES_USER: root
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./postgis_data:/var/lib/pgsql/data
