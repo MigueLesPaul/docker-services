@@ -1,0 +1,16 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - '3030:3000'
+    volumes:
+      - /home/kalpa/homelab-config/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # For Docker integration
+    environment:
+      - PUID=1000  # Your user ID from `id -u`
+      - PGID=1000  # Your group ID from `id -g`
+      - HOMEPAGE_ALLOWED_HOSTS=pve-kalpa:3030,localhost:3030,192.168.1.27:3030
+    restart: unless-stopped
+
+
