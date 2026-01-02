@@ -1,0 +1,300 @@
+version: "2.1"
+services:
+  jellyfin:
+    container_name: jellyfin
+    image: jellyfin/jellyfin
+    network_mode: "bridge"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    ports:
+      - 8096:8096
+    volumes:
+      - /home/miguel/homelab/jellyfin/config:/config
+      - /home/miguel/homelab/jellyfin/cache:/cache
+      - type: bind
+        source: /home/miguel/Music
+        target: /media
+        read_only: true
+      - type: bind
+        source: /home/miguel/Videos
+        target: /media2
+        read_only: true
+      - type: bind
+        source: /home/miguel/Books
+        target: /media3
+        read_only: true
+
+      # Optional - extra fonts to be used during transcoding with subtitle burn-in
+      #- type: bind
+      #  source: /path/to/fonts
+      #  target: /usr/local/share/fonts/custom
+      # read_only: true
+    restart: "unless-stopped"
+    # Optional - alternative address used for autodiscovery
+    #environment:
+    # - JELLYFIN_PublishedServerUrl=http://example.com
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    #extra_hosts:
+    #  - 'host.docker.internal:host-gateway'
+  # firefox:
+  #   image: lscr.io/linuxserver/firefox:latest
+  #   container_name: firefox
+  #   security_opt:
+  #     - seccomp:unconfined
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Africa/Casablanca
+  #     - DRINODE=/dev/dri/renderD128
+  #     - DISABLE_IPV6=true
+  #     - DOCKER_MODS=linuxserver/mods:firefox-fonts
+  #   volumes: - ./configs/firefox:/config
+  #   ports:
+  #     - 3001:3001
+  #   networks:
+  #     - firefox
+  #   shm_size: "1gb"
+  #   devices:
+  #     - /dev/dri/renderD128:/dev/dri/renderD128
+  #   group_add:
+  #     - "109"
+  #   restart: unless-stopped
+  # duplicati:
+  #   image: lscr.io/linuxserver/duplicati:latest
+  #   container_name: duplicati
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Africa/Casablanca
+  #   volumes:
+  #     - ./configs/duplicati/config:/config
+  #     - ./configs:/source
+  #     - ./docker-compose.yml:/source/docker-compose.yml
+  #     - ./configs/duplicati/restore:/restore
+  #   networks:
+  #     - duplicati
+  #   ports:
+  #     - 8200:8200
+  #   restart: unless-stopped
+  transmission:
+    image: linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000 # Adjust as needed
+      - PGID=1000 # Adjust as needed
+
+    volumes:
+      - /home/miguel/homelab/mediarr/transmission:/config
+      - myDlFolders:/downloads # This will be the download folder shared by all apps
+    ports:
+      - "9091:9091" # Web UI
+      - "51413:51413" # Torrent port TCP
+      - "51413:51413/udp" # Torrent port UDP
+    restart: unless-stopped
+
+  # lazylibrarian:
+  #   image: lscr.io/linuxserver/lazylibrarian:latest
+  #   container_name: lazylibrarian
+  #   environment:
+  #     - PUID=1000             # Use your user ID
+  #     - PGID=1000             # Use your group ID
+  #     - TZ=Europe/Paris       # Set your timezone
+  #     # Optionally, add mods for Calibre/ffmpeg support if you need conversion:
+  #     # - DOCKER_MODS=linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg
+  #   volumes:
+  #     - ./config:/config
+  #     - myDlFolders:/downloads
+  #     - /home/miguel/Books:/books
+  #   ports:
+  #     - 5299:5299
+  #   restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    hostname: bazarr
+    network_mode: "bridge"
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      # - TZ=Africa/Casablanca
+    volumes:
+      - /home/miguel/homelab/mediarr/bazarr:/config
+      - myMedia:/tv
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    depends_on:
+      - sonarr
+      - radarr
+  # jellyseerr:
+  #   image: fallenbagel/jellyseerr:latest
+  #   container_name: jellyseerr
+  #   hostname: jellyseerr
+  #   network_mode: 'bridge'
+  #   # networks:
+  #   #   - mediarr
+  #   user: 1000:1000
+  #   # environment:
+  #     # - TZ=Africa/Casablanca
+  #   ports:
+  #     - 5055:5055
+  #   volumes:
+  #     - /home/miguel/homelab/mediarr/jellyseerr:/app/config
+  # restart: unless-stopped
+  #   depends_on:
+  #     - sonarr
+  #     - radarr
+  #     - jellyfin
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
+    hostname: prowlarr
+    network_mode: "bridge"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      # - TZ=Africa/Casablanca
+    volumes:
+      - /home/miguel/homelab/mediarr/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    # depends_on:
+    #   - flaresolverr
+  # flaresolverr:
+  #   image: ghcr.io/flaresolverr/flaresolverr:latest
+  #   container_name: flaresolverr
+  #   hostname: flaresolverr
+  #   network_mode: 'bridge'
+  #   # networks:
+  #   #   - mediarr
+  #   environment:
+  #     - LOG_LEVEL=${LOG_LEVEL:-info}
+  #     - LOG_HTML=${LOG_HTML:-false}
+  #     - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+  #     # - TZ=Africa/Casablanca
+  #   restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    hostname: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      # - TZ=Africa/Casablanca
+      - WEBUI_PORT=8080
+      #- WEBUI_USER=miguel  # Check image documentation
+      - WEBUI_PASSWORD=migue
+      - WEBUI_USERNAME=miguel
+      - QBITTORRENT_WEBUI_ADDRESS=0.0.0.0
+
+    volumes:
+      - /home/miguel/homelab/mediarr/qbittorrent:/config
+      - myDlFolders:/downloads
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    hostname: radarr
+    network_mode: "bridge"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      # - TZ=Africa/Casablanca
+    volumes:
+      - /home/miguel/homelab/mediarr/radarr:/config
+      - myMedia:/tv
+      - myDlFolders:/mnt/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    depends_on:
+      - prowlarr
+      - qbittorrent
+      - jellyfin
+
+  readarr:
+    image: blampe/rreading-glasses
+    container_name: readarr
+    hostname: readarr
+    networks:
+      - mediarr
+    # environment:
+    #   - PUID=1000
+    #   - PGID=100
+    #   - TZ=Africa/Casablanca
+    volumes:
+      - /home/miguel/homelab/mediarr/readarr:/config
+      - /home/miguel/Books:/mnt/media
+      - myDlFolders:/mnt/downloads
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+    depends_on:
+      - prowlarr
+      - qbittorrent
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    hostname: sonarr
+    network_mode: "bridge"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    #   - TZ=Africa/Casablanca
+    volumes:
+      - /home/miguel/homelab/mediarr/sonarr:/config
+      - myMedia:/tv
+      - myDlFolders:/mnt/downloads
+    depends_on:
+      - prowlarr
+      - qbittorrent
+      - jellyfin
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+  # lidarr:
+  #   image: blampe/lidarr:latest
+  #   container_name: lidarr
+  #   environment:
+  #     # - TZ=Europe/Berlin         # Set your timezone as needed
+  #     - PGID=1000                # Set your user group ID (if needed)
+  #     - PUID=1000                # Set your user ID (if needed)
+  #   volumes:
+  #     - /home/miguel/homelab/mediarr/lidarr:/config         # Persistent data directory for Lidarr
+  #     - /home/miguel/Music:/music           # Your music library
+  #     - myDlFolders:/downloads   # Downloads/incoming folder
+  #   ports:
+  #     - "8686:8686"              # Web UI port (adjust as needed)
+  #   restart: unless-stopped
+
+networks:
+  mediarr:
+    driver: bridge
+volumes:
+  myMedia:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/miguel/Videos
+
+  myDlFolders:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/miguel/Downloads/qBittorrent
+

@@ -1,0 +1,14 @@
+services:
+  lingarr:
+    image: lingarr/lingarr:latest # Use latest-arm64 for the ARM build
+    container_name: lingarr
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_URLS=http://+:9876
+    ports:
+      - "9876:9876"
+    volumes:
+      - /home/miguel/Videos:/movies
+      - /home/miguel/Videos:/tv
+      - /home/miguel/homelab/mediarr/lingarr/config:/app/config
+    

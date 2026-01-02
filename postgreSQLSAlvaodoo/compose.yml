@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  odoo-db-save:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: Mg6LCdqKIUxu8et0FFr
+      POSTGRES_USER: root
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgresqldata:/var/lib/pgsql/data

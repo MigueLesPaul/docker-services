@@ -1,0 +1,92 @@
+# docker-compose.yml
+#
+# This Docker Compose file sets up n8n with a PostgreSQL database and Redis for caching/queuing.
+# It's configured for simple local access.
+#
+# Before running:
+# 1. Ensure Docker and Docker Compose are installed on your machine.
+# 2. Create a .env file in the same directory as this docker-compose.yml with your database credentials.
+#    (See the .env file example provided below)
+# 3. Create the directories for persistent data:
+#    mkdir -p ./n8n_data ./postgres_data ./redis_data
+#
+# To start n8n:
+#    docker compose up -d
+#
+# To stop n8n:
+#    docker compose down
+#
+# To stop and remove all data (use with caution!):
+#    docker compose down -v
+
+version: '3.8'
+
+services:
+  n8n:
+    container_name: n8n
+    image: docker.n8n.io/n8nio/n8n # Official n8n Docker image
+    restart: unless-stopped
+    ports:
+      - "5678:5678" # Exposes n8n's web interface on port 5678 of your host machine
+    volumes:
+      - ./n8n_data:/home/node/.n8n # Persistent storage for n8n's configuration and workflows3
+    env_file:
+      - .env # Load environment variables from the .env file
+    environment:
+      # n8n database configuration
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres # Connect to the postgres service by its Docker service name
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB_NAME}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      # n8n Redis configuration (for queues and cache)
+      - QUEUE_BULL_TYPE=redis
+      - QUEUE_BULL_REDIS_HOST=redis # Connect to the redis service by its Docker service name
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD} # If your Redis requires a password
+      - N8N_BASIC_AUTH_ACTIVE=false # Set to true to enable basic authentication
+      # - N8N_BASIC_AUTH_USER=your_username # Uncomment and set if basic auth is active
+      # - N8N_BASIC_AUTH_PASSWORD=your_password # Uncomment and set if basic auth is active
+      - N8N_PROTOCOL=http # Use http for local access
+      - WEBHOOK_URL=http://localhost:5678/ # Important for webhooks to work correctly locally
+      - TZ=Europe/Madrid # Set your desired timezone (e.g., America/New_York, Asia/Tokyo)
+      # - GENERIC_TIMEZONE=Europe/Madrid # Uncomment if you want to use a generic timezone for all executions
+    networks:
+      - n8n_internal_network # Connect n8n to the internal network
+     
+  postgres:
+    container_name: n8n_postgres
+    image: postgres:14 # Using PostgreSQL version 14
+    restart: unless-stopped
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data # Persistent storage for PostgreSQL data
+    env_file:
+      - .env # Load environment variables for PostgreSQL
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # No ports exposed to the host machine, only accessible via n8n_internal_network
+    networks:
+      - n8n_internal_network
+
+  redis:
+    container_name: n8n_redis
+    image: redis:6.2-alpine # Lightweight Redis image
+    restart: unless-stopped
+    volumes:
+      - ./redis_data:/data # Persistent storage for Redis data
+    env_file:
+      - .env # Load environment variables for Redis (e.g., password)
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD} # If you set a password for Redis
+    # No ports exposed to the host machine, only accessible via n8n_internal_network
+    networks:
+      - n8n_internal_network
+
+# Define the internal network
+networks:
+  n8n_internal_network:
+    driver: bridge # Creates an isolated bridge network for these services
+

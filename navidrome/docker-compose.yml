@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: 1000:1000 # Adjust to the owner of your volumes
+    ports:
+      - "4533:4533"
+    restart: unless-stopped
+    environment:
+      ND_LOGLEVEL: info # Example Environment variables
+      ND_SCANSCHEDULE: 1h # Schedule scanner to run every hour
+      ND_SESSIONTIMEOUT: 24h # Session timeout
+      ND_LASTFM_APIKEY: "bdec91af4d86d55fbc5c663b342284b4"
+      ND_LASTFM_SECRET: "95c6da2303493f471ea693ae20ac5a64"
+      # You can add more ND_ prefixed variables here to customize
+    volumes:
+      - "/home/kalpa/homelab-config/navidrome:/data" # Persistent data storage (database, cache)
+        #- "/home/miguel/Music:/music:ro" # Music library folder, read-only
+      - "/home/kalpa/ext-hdd/BBLACK/Music:/music/bblack:ro"  
+      # Optionally mount a configuration file as well
