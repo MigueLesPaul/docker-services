@@ -1,0 +1,55 @@
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/kalpa/ext-hdd/BBLACK/nextcloud-data/db
+      o: bind
+
+  nextcloud:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/kalpa/ext-hdd/BBLACK/nextcloud-data/nextcloud
+      o: bind
+
+services:
+  db:
+    image: mariadb:10.6
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED
+    ports: 
+      - "3307:3306"
+    volumes:
+      - db:/var/lib/mysql
+    environment: 
+      - MARIADB_ROOT_PASSWORD=1drSA3Pqpdxy6vGWEXX0qf
+      - MARIADB_PASSWORD=lHcMNH387jHAYWJhc0peLB
+      - MARIADB_USER=nextcloud
+      - MARIADB_DATABASE=nextcloud
+  
+  app:
+    #image: nextcloud
+    image: lscr.io/linuxserver/nextcloud:latest
+    restart: always
+    ports:
+      - 8081:80
+    links:
+      - db
+    depends_on: 
+      - db
+    volumes:
+      - nextcloud:/data
+      - /home/kalpa/homelab-config/nextcloud:/config
+    environment: 
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - MYSQL_HOST=db:3306
+      - MYSQL_DATABASE=nextcloud
+        #- MYSQL_ROOT_PASSWORD=1drSA3Pqpdxy6vGWEXX0qf
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=lHcMNH387jHAYWJhc0peLB
+      - NEXTCLOUD_ADMIN_USER=root
+      - NEXTCLOUD_ADMIN_PASSWORD=1drSA3Pqpdxy6vGWEXX0qf
+    

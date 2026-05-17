@@ -1,0 +1,9 @@
+name: koinsight
+services:
+  koinsight:
+    image: ghcr.io/georgesg/koinsight:latest
+    restart: unless-stopped
+    ports:
+      - "6061:3000"
+    volumes:
+      - ./data:/app/data

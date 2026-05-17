@@ -1,0 +1,9 @@
+services:
+  jupyter:
+    image: quay.io/jupyter/scipy-notebook:latest
+    container_name: jupyterlab
+    ports:
+      - "8888:8888"
+    volumes:
+      - /home/kalpa/Sync:/home/jovyan/work
+    restart: unless-stopped
