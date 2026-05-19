@@ -10,20 +10,20 @@ services:
     ports:
       - 8096:8096
     volumes:
-      - /home/miguel/homelab/jellyfin/config:/config
-      - /home/miguel/homelab/jellyfin/cache:/cache
+      - /home/kalpa/homelab-config/jellyfin/config:/config
+      - /home/kalpa/homelab-config/jellyfin/cache:/cache
       - type: bind
-        source: /home/miguel/Music
+        source: /home/kalpa/ext-hdd/GROUGE/Series
         target: /media
         read_only: true
       - type: bind
-        source: /home/miguel/Videos
+        source: /home/kalpa/ext-hdd/GROUGE/Pelis
         target: /media2
         read_only: true
-      - type: bind
-        source: /home/miguel/Books
-        target: /media3
-        read_only: true
+            #- type: bind
+        #source: /home/miguel/Books
+        #target: /media3
+        #read_only: true
 
       # Optional - extra fonts to be used during transcoding with subtitle burn-in
       #- type: bind
@@ -77,21 +77,21 @@ services:
   #   ports:
   #     - 8200:8200
   #   restart: unless-stopped
-  transmission:
-    image: linuxserver/transmission:latest
-    container_name: transmission
-    environment:
-      - PUID=1000 # Adjust as needed
-      - PGID=1000 # Adjust as needed
+  #transmission:
+  #  image: linuxserver/transmission:latest
+  #  container_name: transmission
+  #  environment:
+  #    - PUID=1000 # Adjust as needed
+  #    - PGID=1000 # Adjust as needed
 
-    volumes:
-      - /home/miguel/homelab/mediarr/transmission:/config
-      - myDlFolders:/downloads # This will be the download folder shared by all apps
-    ports:
-      - "9091:9091" # Web UI
-      - "51413:51413" # Torrent port TCP
-      - "51413:51413/udp" # Torrent port UDP
-    restart: unless-stopped
+      #  volumes:
+      #    - /home/miguel/homelab/mediarr/transmission:/config
+      #    - myDlFolders:/downloads # This will be the download folder shared by all apps
+      #  ports:
+      #   - "9091:9091" # Web UI
+      #    - "51413:51413" # Torrent port TCP
+      #    - "51413:51413/udp" # Torrent port UDP
+      #  restart: unless-stopped
 
   # lazylibrarian:
   #   image: lscr.io/linuxserver/lazylibrarian:latest
@@ -121,7 +121,7 @@ services:
       - PGID=1000
       # - TZ=Africa/Casablanca
     volumes:
-      - /home/miguel/homelab/mediarr/bazarr:/config
+      - /home/kalpa/homelab-config/mediarr/bazarr:/config
       - myMedia:/tv
     ports:
       - 6767:6767
@@ -162,7 +162,7 @@ services:
       - PGID=1000
       # - TZ=Africa/Casablanca
     volumes:
-      - /home/miguel/homelab/mediarr/prowlarr:/config
+      - /home/kalpa/homelab-config/mediarr/prowlarr:/config
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -189,17 +189,17 @@ services:
       - PUID=1000
       - PGID=1000
       # - TZ=Africa/Casablanca
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=8097
       #- WEBUI_USER=miguel  # Check image documentation
       - WEBUI_PASSWORD=migue
       - WEBUI_USERNAME=miguel
       - QBITTORRENT_WEBUI_ADDRESS=0.0.0.0
 
     volumes:
-      - /home/miguel/homelab/mediarr/qbittorrent:/config
+      - /home/kalpa/homelab-config/mediarr/qbittorrent:/config
       - myDlFolders:/downloads
     ports:
-      - 8080:8080
+      - 8097:8097
       - 6881:6881
       - 6881:6881/udp
     restart: unless-stopped
@@ -214,7 +214,7 @@ services:
       - PGID=1000
       # - TZ=Africa/Casablanca
     volumes:
-      - /home/miguel/homelab/mediarr/radarr:/config
+      - /home/kalpa/homelab-config/mediarr/radarr:/config
       - myMedia:/tv
       - myDlFolders:/mnt/downloads
     ports:
@@ -225,26 +225,28 @@ services:
       - qbittorrent
       - jellyfin
 
-  readarr:
-    image: blampe/rreading-glasses
-    container_name: readarr
-    hostname: readarr
-    networks:
-      - mediarr
+        # readarr:
+        #  image: blampe/rreading-glasses
+        #  container_name: readarr
+        # hostname: readarr
+        # networks:
+        #   - mediarr
     # environment:
     #   - PUID=1000
     #   - PGID=100
     #   - TZ=Africa/Casablanca
-    volumes:
-      - /home/miguel/homelab/mediarr/readarr:/config
-      - /home/miguel/Books:/mnt/media
-      - myDlFolders:/mnt/downloads
-    ports:
-      - 8787:8787
-    restart: unless-stopped
-    depends_on:
-      - prowlarr
-      - qbittorrent
+    #   volumes:
+    #   - /home/kalpa/homelab-config/mediarr/readarr:/config
+   
+      #- /home/miguel/Books:/mnt/media
+      #   - myDlFolders:/mnt/downloads
+      # ports:
+      #   - 8787:8787
+  
+        #restart: unless-stopped
+        #  depends_on:
+        #  - prowlarr
+        #   - qbittorrent
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -255,7 +257,7 @@ services:
       - PGID=1000
     #   - TZ=Africa/Casablanca
     volumes:
-      - /home/miguel/homelab/mediarr/sonarr:/config
+      - /home/kalpa/homelab-config/mediarr/sonarr:/config
       - myMedia:/tv
       - myDlFolders:/mnt/downloads
     depends_on:
@@ -289,12 +291,12 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/miguel/Videos
+      device: /home/kalpa/ext-hdd/GROUGE/Series
 
   myDlFolders:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/miguel/Downloads/qBittorrent
+      device: /home/kalpa/Downloads/qBittorrent
 

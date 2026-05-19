@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  wallabag:
+    image: wallabag/wallabag:latest
+    container_name: wallabag
+    restart: unless-stopped
+    ports:
+      - "6062:80"
+    environment:
+      # Database settings
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_pgsql
+      - SYMFONY__ENV__DATABASE_HOST=wallabag_db
+      - SYMFONY__ENV__DATABASE_PORT=5432
+      - SYMFONY__ENV__DATABASE_NAME=wallabag
+      - SYMFONY__ENV__DATABASE_USER=wallabag
+      - SYMFONY__ENV__DATABASE_PASSWORD=${POSTGRES_PASSWORD}
+      - SYMFONY__ENV__DATABASE_MIGRATIONS=true
+      
+      # Redis cache settings
+      - SYMFONY__ENV__REDIS_HOST=wallabag_redis
+      - SYMFONY__ENV__REDIS_PORT=6379
+      
+      # Application settings
+      - SYMFONY__ENV__DOMAIN_NAME=http://pve-kalpa:6062
+      - SYMFONY__ENV__SERVER_NAME="wallabag Docker"
+      
+      # Email settings (optional - using dummy)
+      - SYMFONY__ENV__MAILER_HOST=127.0.0.1
+      - SYMFONY__ENV__MAILER_USER=~
+      - SYMFONY__ENV__MAILER_PASSWORD=~
+      
+      # Two-factor authentication (optional)
+      - SYMFONY__ENV__TWO_FACTOR_AUTH=true
+      
+      # Secret key (generate a unique one)
+      - SYMFONY__ENV__SECRET=${WALLABAG_SECRET}
+      
+    volumes:
+      - wallabag_images:/var/www/wallabag/web/assets/images
+    depends_on:
+      - wallabag_db
+      - wallabag_redis
+    networks:
+      - wallabag_network
+
+  wallabag_db:
+    image: postgres:15-alpine
+    container_name: wallabag_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=wallabag
+      - POSTGRES_USER=wallabag
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - wallabag_db_data:/var/lib/postgresql/data
+    networks:
+      - wallabag_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wallabag"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wallabag_redis:
+    image: redis:7-alpine
+    container_name: wallabag_redis
+    restart: unless-stopped
+    volumes:
+      - wallabag_redis_data:/data
+    networks:
+      - wallabag_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  wallabag_images:
+  wallabag_db_data:
+  wallabag_redis_data:
+
+networks:
+  wallabag_network:
+    driver: bridge
