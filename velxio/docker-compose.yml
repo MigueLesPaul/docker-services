@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  velxio:
+    image: ghcr.io/davidmonterocrespo24/velxio:master
+    container_name: velxio
+    ports:
+      - "6064:80"
+    restart: unless-stopped
