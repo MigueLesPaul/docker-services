@@ -1,0 +1,60 @@
+version: '3.8'
+services:
+  # PostgreSQL Database
+  postgres:
+    container_name: homeassistant_db
+    image: postgres:16-alpine  # Lightweight PostgreSQL 16
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=homeassistant
+      - POSTGRES_USER=hass_user
+      - POSTGRES_PASSWORD=KJ4BXQ0O1A7WiaUJw2L6tAingHdQYu3
+      - POSTGRES_HOST_AUTH_METHOD=trust  # Only for local networks
+      - TZ=Europe/Madrid
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/backup:/backup  # Optional: mount a backup directory
+    ports:
+      - "5432:5432"  # Expose PostgreSQL port (optional)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hass_user -d homeassistant"]
+      interval: 10s
+      timeout: 5s
+      retries: 5  
+  ## Home Assistant Core
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    privileged: true
+    network_mode: host  # Required for discovery features
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./homeassistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    environment:
+      - TZ=Europe/Madrid
+    # Remove network_mode: host and use ports if you don't need host networking
+    #    ports:
+    # - "6065:8123"
+
+  # Optional: pgAdmin for database management
+  #pgadmin:
+    #container_name: pgadmin
+      #image: dpage/pgadmin4:latest
+      #restart: unless-stopped
+      #environment:
+      #- PGADMIN_DEFAULT_EMAIL=admin@homeassistant.local
+        #- PGADMIN_DEFAULT_PASSWORD=admin_password_here
+        #    ports:
+        #   - "6050:80"
+        #depends_on:
+        #- postgres
+        # volumes:
+        #- ./pgadmin/data:/var/lib/pgadmin
+    # Only enable pgAdmin if you want a web UI for the database
+    #profiles:
+    # - management
