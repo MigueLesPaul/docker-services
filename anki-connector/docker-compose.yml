@@ -1,0 +1,15 @@
+services:
+  anki:
+    image: thisisnttheway/headless-anki:latest
+    container_name: anki
+    ports:
+      - "8765:8765"
+      - "5900:5900"
+    environment:
+      - ANKICONNECT_WILDCARD_ORIGIN=1
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+
+      #volumes:
+      #anki-data:

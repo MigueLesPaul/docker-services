@@ -1,0 +1,19 @@
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    hostname: 'pve-kalpa' # Replace with your domain if you have one
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://pve-kalpa:8079' # Replace with your URL
+        nginx['listen_port'] = 80
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+    ports:
+      - '8079:80'       # Web interface
+      - '2222:22'       # SSH for Git operations
+    volumes:
+      - ./config:/etc/gitlab
+      - ./logs:/var/log/gitlab
+      - ./data:/var/opt/gitlab
+    shm_size: '256m'    # Important for performance [citation:1][citation:5]
