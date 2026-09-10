@@ -11,6 +11,7 @@ services:
         gitlab_rails['gitlab_shell_ssh_port'] = 2222
     ports:
       - '8079:80'       # Web interface
+      - '8090:8090'     # Container registry
       - '2222:22'       # SSH for Git operations
     volumes:
       - ./config:/etc/gitlab
