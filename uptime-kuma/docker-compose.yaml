@@ -2,7 +2,8 @@ version: "3.8"
 
 services:
   uptime-kuma:
-    image: louislam/uptime-kuma:latest
+    image: louislam/uptime-kuma:2
+    #image: dhi.io/uptimekuma:latest
     container_name: uptime-kuma
     restart: always
     ports:
