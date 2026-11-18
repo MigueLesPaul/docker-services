@@ -2,7 +2,7 @@ version: "3"
 
 services:
   navidrome:
-    image: deluan/navidrome:0.59.0 #:latest
+    image: deluan/navidrome:0.64.2 #:latest
     container_name: navidrome
     user: 1000:1000 # Adjust to the owner of your volumes
     ports:
