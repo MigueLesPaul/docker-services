@@ -30,7 +30,7 @@ services:
   
   app:
     #image: nextcloud
-    image: lscr.io/linuxserver/nextcloud:latest
+    image: lscr.io/linuxserver/nextcloud:33.0.2-ls423    #latest
     restart: always
     ports:
       - 8081:80
