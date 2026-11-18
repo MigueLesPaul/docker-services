@@ -14,6 +14,8 @@ services:
       ND_SESSIONTIMEOUT: 24h # Session timeout
       ND_LASTFM_APIKEY: "bdec91af4d86d55fbc5c663b342284b4"
       ND_LASTFM_SECRET: "95c6da2303493f471ea693ae20ac5a64"
+      ND_COVERARTPRIORITY: "embedded,cover.*, folder.*, front.*, external"
+      ND_LYRICSPRIORITY: "embedded,.lrc,.txt"
         #ND_SCANNER_PURGEMISSING: always # Options: "never" (default), "always",
       # You can add more ND_ prefixed variables here to customize
     volumes:
