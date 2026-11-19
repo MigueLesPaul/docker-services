@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   wallabag:
-    image: wallabag/wallabag:latest
+    image: wallabag/wallabag:2.6.17 #latest
     container_name: wallabag
     restart: unless-stopped
     ports:
