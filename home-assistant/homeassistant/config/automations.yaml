@@ -1,0 +1,356 @@
+- id: '1780079892765'
+  alias: Cargado el Movil
+  description: ''
+  triggers:
+  - type: battery_level
+    device_id: 65035ebeb0c5aded347e8ab0132a73ad
+    entity_id: d1f0a53930e2b530f4670b73fa63f0cf
+    domain: sensor
+    trigger: device
+    above: 99
+  conditions: []
+  actions:
+  - action: notify.send_message
+    metadata: {}
+    target:
+      entity_id: notify.notepro12
+    data:
+      message: Cargado!
+      title: Home Assistant
+  mode: single
+- id: '1780260706971'
+  alias: 'Menos horas leidas últimos 7 días '
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.koinsight_last_7_days
+    below: 21600
+  conditions: []
+  actions:
+  - action: notify.notify
+    metadata: {}
+    data:
+      message: Has leido menos de 7 horas esta semana
+      title: Objetivo de lectura semanal
+  mode: single
+- id: '1780262374213'
+  alias: Miguel at home
+  description: ''
+  use_blueprint:
+    path: homeassistant/notify_leaving_zone.yaml
+    input:
+      person_entity: person.miguel_hinojosa
+      zone_entity: zone.home
+      notify_device: 65035ebeb0c5aded347e8ab0132a73ad
+- id: '1780263468825'
+  alias: Temperatura en la sala +35
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.esp32_1_aht20_temperature
+    above: 35
+  conditions: []
+  actions:
+  - action: notify.notify
+    metadata: {}
+    data:
+      message: Temperatura por encima de 35
+      title: 'Température en la Sala '
+  mode: single
+- id: '1780263605413'
+  alias: Humedad de ña sala -20
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.esp32_1_aht20_humidity
+    below: 20
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions: []
+  actions:
+  - action: notify.send_message
+    data:
+      title: Climatización de la sala
+      message: Humedad por debajo de 20%
+    target:
+      device_id: 98c095a9911e36951e46b8511b5d1eae
+      entity_id:
+      - notify.notepro12
+      - notify.tab_10_wifi
+  mode: single
+- id: '1780390661479'
+  alias: Correr por debajo de 15km
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.run_last_30_days
+    below: 15
+  conditions: []
+  actions:
+  - action: notify.send_message
+    metadata: {}
+    target:
+      device_id:
+      - 65035ebeb0c5aded347e8ab0132a73ad
+      - 307fcc92ad5f17c7be4f94493e94b2d4
+      - 1436ff912c288be0d3c1cba5d9773db7
+      - 98c095a9911e36951e46b8511b5d1eae
+    data:
+      message: Correr por debajo de 15km este mes
+  mode: single
+- id: '1780479193250'
+  alias: Recordatorio semanal de lectura
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.pages_last_7_days
+    below: 250
+  conditions: []
+  actions:
+  - action: notify.send_message
+    metadata: {}
+    target:
+      entity_id:
+      - notify.tab_10_wifi
+      - notify.notepro12
+    data:
+      message: Recuerda Leer algo hoy.
+  mode: single
+- id: '1780497016583'
+  alias: Recordatorio de Lectura 1
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.pages_last_7_days
+    below: 100
+  conditions: []
+  actions:
+  - action: notify.send_message
+    metadata: {}
+    target:
+      entity_id:
+      - notify.tab_10_wifi
+      - notify.notepro12
+    data:
+      message: Recuerda Leer algo hoy.
+  mode: single
+- id: '1780497072917'
+  alias: Recordatorio mensual de bicicleta
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bike_last_30_days
+    below: 120
+  conditions: []
+  actions:
+  - action: notify.send_message
+    metadata: {}
+    target:
+      device_id:
+      - 65035ebeb0c5aded347e8ab0132a73ad
+      - 307fcc92ad5f17c7be4f94493e94b2d4
+      - 1436ff912c288be0d3c1cba5d9773db7
+      - 98c095a9911e36951e46b8511b5d1eae
+    data:
+      message: Has hecho menos de de 120km de Bicicleta este Mes
+      title: Ejercicios
+  mode: single
+- id: '1780497131427'
+  alias: Temperatura de la sala 1
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.esp32_1_aht20_temperature
+    above: 30
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions: []
+  actions:
+  - action: notify.notify
+    metadata: {}
+    data:
+      message: Temperatura por encima de 30
+      title: 'Température en la Sala '
+  mode: single
+- id: '1780497236979'
+  alias: Recordatorio de Ahorro Mensual
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.estimated_month_saving
+    below: 450
+  conditions: []
+  actions:
+  - action: notify.notify
+    metadata: {}
+    data:
+      message: Ahorro mensual por debajo de lo planificado
+      title: Recoratiorio de ahorros
+  mode: single
+- id: '1780497432797'
+  alias: Tablet Batería debajo de 30
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.tab_10_wifi_battery_level
+    below: 30
+  conditions: []
+  actions:
+  - action: notify.notify
+    metadata: {}
+    data:
+      message: Batería Tablet por debajo de 30
+      title: Baterías
+  - action: notify.send_message
+    metadata: {}
+    target:
+      entity_id:
+      - notify.notepro12
+      - notify.tab_10_wifi
+      device_id: 98c095a9911e36951e46b8511b5d1eae
+    data: {}
+  mode: single
+- id: '1782507671321'
+  alias: Radio matutino
+  description: ''
+  triggers:
+  - trigger: time
+    at: 08:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  conditions: []
+  actions:
+  - action: media_player.play_media
+    metadata: {}
+    target:
+      device_id: 1665b1c8971c9d7f7170ffa1be0300f8
+    data:
+      media:
+        media_content_id: media-source://radio_browser/db656299-a63e-4b7b-ac5a-ac2444459ae4
+        media_content_type: audio/mpeg
+        metadata:
+          title: RNE - R1 --> Madrid
+          thumbnail: https://img2.rtve.es/a/3893534/square/?h=320
+          media_class: music
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: app
+            media_content_id: media-source://radio_browser
+          - media_content_type: music
+            media_content_id: media-source://radio_browser/country/ES
+          browse_entity_id: media_player.music_player_daemon
+  - action: media_player.volume_set
+    metadata: {}
+    data:
+      volume_level: 0.7
+    target:
+      entity_id: media_player.music_player_daemon
+  mode: single
+- id: '1782551453503'
+  alias: Parar todo al salir
+  description: ''
+  triggers:
+  - trigger: zone
+    entity_id: person.miguel_hinojosa
+    zone: zone.home
+    event: leave
+  conditions: []
+  actions:
+  - action: media_player.media_pause
+    metadata: {}
+    target:
+      entity_id: media_player.music_player_daemon
+    data: {}
+  - action: notify.send_message
+    metadata: {}
+    target:
+      entity_id:
+      - notify.notepro12
+      - notify.capitan_beto_capitan_beto
+      device_id: 98c095a9911e36951e46b8511b5d1eae
+    data:
+      message: Se Han detenido algunos servicios al salir
+      title: Stand By
+  mode: single
+- id: '1785353313717'
+  alias: 'NFC: Inicia Pomodoro trabajo'
+  description: ''
+  triggers:
+  - trigger: tag
+    tag_id: 829c481e-50f3-4d55-9ca9-6ba72f246bb5
+  conditions: []
+  actions:
+  - metadata: {}
+    target:
+      entity_id: counter.cofee
+    data: {}
+    action: counter.increment
+  mode: single
+- id: '1785488016576'
+  alias: 'Maquina de café '
+  description: ''
+  triggers:
+  - trigger: tag
+    tag_id: 801ae4a4-e33c-449a-8d52-84b8cc3636dd
+  conditions: []
+  actions:
+  - metadata: {}
+    target:
+      device_id: 98c095a9911e36951e46b8511b5d1eae
+    data:
+      message: Café registrado!
+    action: notify.send_message
+  - metadata: {}
+    target:
+      entity_id: counter.coffee
+    data: {}
+    action: counter.increment
+  mode: single
+- id: '1785521889334'
+  alias: 'Resetear café '
+  description: ''
+  triggers:
+  - trigger: time
+    at: 00:00:00
+  conditions: []
+  actions:
+  - metadata: {}
+    target:
+      entity_id: counter.coffee
+    data:
+      value: 0
+    action: counter.set_value
+  mode: single
+- id: big_vacuum_nfc
+  alias: 'NFC: Registra pase de aspiradora'
+  description: Incrementa counter.big_vacuum al escanear el tag NFC de la aspiradora
+  triggers:
+  - trigger: tag
+    tag_id: big_vacuum
+  conditions: []
+  actions:
+  - metadata: {}
+    target:
+      entity_id: counter.big_vacuum
+    data: {}
+    action: counter.increment
+  mode: single
