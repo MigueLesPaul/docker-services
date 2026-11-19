@@ -24,7 +24,7 @@ services:
   ## Home Assistant Core
   homeassistant:
     container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:stable
+    image: ghcr.io/home-assistant/home-assistant:2026.11.2 #2026.5.4
     restart: unless-stopped
     privileged: true
     network_mode: host  # Required for discovery features
